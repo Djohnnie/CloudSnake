@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+
 namespace CloudSnake.WinForms;
 
 internal static class Program
@@ -10,7 +12,12 @@ internal static class Program
     {
         // To customize application configuration such as set high DPI settings or default font,
         // see https://aka.ms/applicationconfiguration.
+
+        var services = new ServiceCollection();
+        services.AddSingleton<MainForm>();
+        var serviceProvider = services.BuildServiceProvider();
+
         ApplicationConfiguration.Initialize();
-        Application.Run(new MainForm());
+        Application.Run(serviceProvider.GetService<MainForm>());
     }
 }

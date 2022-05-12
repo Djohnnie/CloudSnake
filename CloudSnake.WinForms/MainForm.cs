@@ -52,4 +52,14 @@ public partial class MainForm : Form
             await connection.SendAsync("Turn", _clientId);
         }
     }
+
+    private void newGameButton_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    private void joinGameButton_Click(object sender, EventArgs e)
+    {
+
+    }
 }
