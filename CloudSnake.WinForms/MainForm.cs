@@ -6,4 +6,14 @@ public partial class MainForm : Form
     {
         InitializeComponent();
     }
+
+    private void newGameButton_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    private void joinGameButton_Click(object sender, EventArgs e)
+    {
+
+    }
 }
