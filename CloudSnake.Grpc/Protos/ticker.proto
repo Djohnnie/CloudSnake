@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option csharp_namespace = "CloudSnake.Grpc";
+
+package ticker;
+
+service Ticker
+{
+	rpc Do (TickerRequest) returns (stream TickerResponse);
+}
+
+message TickerRequest 
+{
+	string clientId = 1;
+}
+
+message TickerResponse 
+{
+
+}

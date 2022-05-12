@@ -28,10 +28,20 @@ partial class MainForm
     /// </summary>
     private void InitializeComponent()
     {
-        this.components = new System.ComponentModel.Container();
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-        this.ClientSize = new System.Drawing.Size(800, 450);
-        this.Text = "Form1";
+            this.SuspendLayout();
+            // 
+            // MainForm
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.KeyPreview = true;
+            this.Name = "MainForm";
+            this.Text = "Form1";
+            this.Load += new System.EventHandler(this.MainForm_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
+            this.ResumeLayout(false);
+
     }
 
     #endregion
