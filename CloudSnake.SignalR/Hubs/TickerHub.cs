@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using CloudSnake.Dto;
+using Microsoft.AspNetCore.SignalR;
 
 namespace CloudSnake.SignalR.Hubs;
 
@@ -14,9 +15,17 @@ public class TickerHub : Hub
         }
     }
 
-    public void Register(string clientId)
+    public async Task SendGameState(GameState gameState)
     {
+        if (Clients != null)
+        {
+            await Clients.Group(gameState.GameCode).SendAsync("ReceiveGameState", gameState);
+        }
+    }
 
+    public async Task JoinGame(string gameCode)
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);
     }
 
     public void Ready(string clientId)

@@ -1,17 +1,16 @@
-﻿using CloudSnake.Business.Interfaces;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using System.Linq.Expressions;
 
 namespace CloudSnake.WebApi;
 
-public interface IApiHelper<TLogic> where TLogic : ILogic
+public interface IApiHelper<TLogic>
 {
     Task<IResult> Execute<TResult>(Expression<Func<TLogic, Task<TResult>>> logicCall);
     Task<IResult> Execute(Func<TLogic, Task> logicCall);
     Task<IResult> Post<TResult>(Func<TLogic, Task<TResult>> logicCall);
 }
 
-public class ApiHelper<TLogic> : IApiHelper<TLogic> where TLogic : ILogic
+public class ApiHelper<TLogic> : IApiHelper<TLogic>
 {
     private readonly TLogic _logic;
     private readonly IMemoryCache _memoryCache;

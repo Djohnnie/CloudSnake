@@ -10,7 +10,7 @@ public class CloudSnakeDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer("");
+        optionsBuilder.UseSqlServer(@"Server=.\SQLDEV;Database=CloudSnake;Trusted_Connection=True;");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -19,14 +19,16 @@ public class CloudSnakeDbContext : DbContext
         {
             e.ToTable("GAMES");
             e.HasKey(x => x.Id).IsClustered(false);
-            e.HasKey(x => x.SysId).IsClustered();
+            e.HasIndex(x => x.SysId).IsClustered();
+            e.Property(x => x.SysId).ValueGeneratedOnAdd();
         });
 
         modelBuilder.Entity<Player>(e =>
         {
             e.ToTable("PLAYERS");
             e.HasKey(x => x.Id).IsClustered(false);
-            e.HasKey(x => x.SysId).IsClustered();
+            e.HasIndex(x => x.SysId).IsClustered();
+            e.Property(x => x.SysId).ValueGeneratedOnAdd();
         });
     }
 }

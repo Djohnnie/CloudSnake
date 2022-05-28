@@ -3,11 +3,10 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CloudSnake.DataAccess\CloudSnake.DataAccess.csproj" />
-    <ProjectReference Include="..\CloudSnake.Domain\CloudSnake.Domain.csproj" />
     <ProjectReference Include="..\CloudSnake.Dto\CloudSnake.Dto.csproj" />
   </ItemGroup>
 

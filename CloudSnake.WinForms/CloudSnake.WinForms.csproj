@@ -23,13 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="Protos\_placeholder" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Protobuf Include="..\CloudSnake.Grpc\Protos\ticker.proto" GrpcServices="Client">
-			<Link>Protos\desktop.proto</Link>
-		</Protobuf>
+	  <ProjectReference Include="..\CloudSnake.Client\CloudSnake.Client.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
