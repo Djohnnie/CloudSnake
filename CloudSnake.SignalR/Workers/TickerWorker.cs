@@ -42,21 +42,49 @@ public class TickerWorker : BackgroundService
                 if (isReady)
                 {
                     var food = Food.FromFoodData(activeGame.FoodData);
+
                     if (food.Bites.Count == 0)
                     {
                         food = GenerateRandomFood(activeGame, food);
+                        await gameManager.UpdateFood(activeGame, food);
                     }
-
-                    await gameManager.UpdateFood(activeGame, food);
 
                     var newPlayerStates = new List<PlayerState>();
 
                     foreach (var playerState in gameState.Players)
                     {
-                        var newState = ProgressSnake(playerState);
+                        bool shouldGrow = false;
+                        var bitesToRemove = new List<Bite>();
+
+                        if (food.Bites.Count > 0)
+                        {
+                            foreach (var bite in food.Bites)
+                            {
+                                foreach (var coordinate in playerState.Snake.Coordinates)
+                                {
+                                    if (bite.X == coordinate.X && bite.Y == coordinate.Y)
+                                    {
+                                        shouldGrow = true;
+                                        bitesToRemove.Add(bite);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (shouldGrow)
+                        {
+                            foreach (var biteToRemove in bitesToRemove)
+                            {
+                                food.Bites.Remove(biteToRemove);
+                            }
+                        }
+
+                        var newState = ProgressSnake(playerState, shouldGrow);
                         newPlayerStates.Add(newState);
                     }
 
+                    await gameManager.UpdateFood(activeGame, food);
                     await gameManager.UpdatePlayerStates(activeGame, newPlayerStates);
                     gameState = gameState with { Players = newPlayerStates, Food = food };
                 }
@@ -111,7 +139,7 @@ public class TickerWorker : BackgroundService
         return food;
     }
 
-    private PlayerState ProgressSnake(PlayerState playerState)
+    private PlayerState ProgressSnake(PlayerState playerState, bool shouldGrow)
     {
         var snake = playerState.Snake;
 
@@ -144,6 +172,11 @@ public class TickerWorker : BackgroundService
             {
                 newCoordinates.Add(snake.Coordinates[i - 1]);
             }
+        }
+
+        if (shouldGrow)
+        {
+            newCoordinates.Add(snake.Coordinates[^1]);
         }
 
         return playerState with { Snake = snake with { Coordinates = newCoordinates } };
