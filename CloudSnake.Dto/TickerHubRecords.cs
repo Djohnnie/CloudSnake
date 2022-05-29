@@ -1,4 +1,6 @@
-﻿namespace CloudSnake.Dto;
+﻿using CloudSnake.Domain;
 
-public record GameState(string GameCode, List<PlayerState> Players);
-public record PlayerState(string PlayerName, bool IsReady);
+namespace CloudSnake.Dto;
+
+public record GameState(int Width, int Height, bool IsReady, string GameCode, List<PlayerState> Players, Food Food);
+public record PlayerState(string PlayerName, bool IsReady, Snake Snake);

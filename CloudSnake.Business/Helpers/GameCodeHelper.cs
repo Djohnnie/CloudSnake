@@ -4,7 +4,7 @@ namespace CloudSnake.Business.Helpers;
 
 public class GameCodeHelper
 {
-    private static readonly char[] _characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
+    private static readonly char[] _characters = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789".ToCharArray();
     private static readonly Random _randomGenerator = new Random();
 
     public string GenerateGameCode()

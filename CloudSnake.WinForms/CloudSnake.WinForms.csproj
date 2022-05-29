@@ -24,6 +24,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\CloudSnake.Client\CloudSnake.Client.csproj" />
+	  <ProjectReference Include="..\CloudSnake.Domain\CloudSnake.Domain.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

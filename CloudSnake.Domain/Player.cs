@@ -6,6 +6,7 @@ public class Player
     public int SysId { get; set; }
     public string Name { get; set; }
     public bool IsReady { get; set; }
+    public string SnakeData { get; set; }
 
     public virtual Game Game { get; set; }
 }

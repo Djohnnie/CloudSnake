@@ -8,6 +8,10 @@ namespace CloudSnake.Business;
 
 public class GameManager
 {
+    public const int SnakeGameWidth = 50;
+    public const int SnakeGameHeight = 35;
+    public const int SnakeLength = 3;
+
     private readonly CloudSnakeDbContext _cloudSnakeDbContext;
     private readonly GameCodeHelper _gameCodeHelper;
 
@@ -33,14 +37,16 @@ public class GameManager
         {
             Id = Guid.NewGuid(),
             Code = gameCode,
-            IsActive = true
+            IsActive = true,
+            FoodData = new Food { Bites = new List<Bite>() }.ToFoodData()
         };
 
         var player = new Player
         {
             Id = Guid.NewGuid(),
             Game = game,
-            Name = request.HostPlayerName
+            Name = request.HostPlayerName,
+            SnakeData = Snake.RandomSnake(SnakeGameWidth, SnakeGameHeight, SnakeLength).ToSnakeData()
         };
 
         _cloudSnakeDbContext.Games.Add(game);
@@ -63,7 +69,8 @@ public class GameManager
         {
             Id = Guid.NewGuid(),
             Game = game,
-            Name = request.PlayerName
+            Name = request.PlayerName,
+            SnakeData = Snake.RandomSnake(SnakeGameWidth, SnakeGameHeight, SnakeLength).ToSnakeData()
         };
 
         _cloudSnakeDbContext.Players.Add(player);
@@ -82,7 +89,14 @@ public class GameManager
             await _cloudSnakeDbContext.SaveChangesAsync();
         }
 
-        return null;
+        var players = await _cloudSnakeDbContext.Players.Where(x => x.Game.Code == request.GameCode).ToListAsync();
+
+        if (players.All(x => x.IsReady))
+        {
+            await ReadyGame(request.GameCode);
+        }
+
+        return new ReadyPlayerResponse();
     }
 
     public async Task<GetActiveGamesResponse> GetActiveGames()
@@ -92,6 +106,65 @@ public class GameManager
             .Where(x => x.IsActive).ToListAsync();
 
         return new GetActiveGamesResponse(
-            activeGames.Select(x => new ActiveGame(x.Code, x.Players.Select(p => new ActivePlayer(p.Name, p.IsReady)).ToList())).ToList());
+            activeGames.Select(x => new ActiveGame(x.Code, x.IsReady, x.Players.Select(p => new ActivePlayer(p.Name, p.IsReady, p.SnakeData)).ToList(), x.FoodData)).ToList());
+    }
+
+    public async Task<AbandonResponse> Abandon(AbandonRequest request)
+    {
+        var player = await _cloudSnakeDbContext.Players.SingleOrDefaultAsync(x => x.Game.Code == request.GameCode && x.Name == request.PlayerName);
+
+        if (player != null)
+        {
+            player.IsReady = false;
+            await _cloudSnakeDbContext.SaveChangesAsync();
+        }
+
+        var players = await _cloudSnakeDbContext.Players.Where(x => x.Game.Code == request.GameCode).ToListAsync();
+        if (players.All(x => !x.IsReady))
+        {
+            var game = await _cloudSnakeDbContext.Games.SingleOrDefaultAsync(x => x.Code == request.GameCode);
+            game.IsActive = false;
+            await _cloudSnakeDbContext.SaveChangesAsync();
+        }
+
+        return new AbandonResponse();
+    }
+
+    public async Task ReadyGame(string gameCode)
+    {
+        var game = await _cloudSnakeDbContext.Games.SingleOrDefaultAsync(x => x.Code == gameCode);
+
+        if (game != null)
+        {
+            game.IsReady = true;
+            await _cloudSnakeDbContext.SaveChangesAsync();
+        }
+    }
+
+    public async Task UpdatePlayerStates(ActiveGame activeGame, List<PlayerState> playerStates)
+    {
+        var players = await _cloudSnakeDbContext.Players.Where(x => x.Game.Code == activeGame.GameCode).ToListAsync();
+
+        foreach (var player in players)
+        {
+            var newPlayerState = playerStates.SingleOrDefault(x => x.PlayerName == player.Name);
+            if (newPlayerState != null)
+            {
+                player.SnakeData = newPlayerState.Snake.ToSnakeData();
+            }
+        }
+
+        await _cloudSnakeDbContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateFood(ActiveGame activeGame, Food food)
+    {
+        var game = await _cloudSnakeDbContext.Games.SingleOrDefaultAsync(x => x.Code == activeGame.GameCode);
+
+        if (game != null)
+        {
+            game.FoodData = food.ToFoodData();
+            await _cloudSnakeDbContext.SaveChangesAsync();
+        }
     }
 }

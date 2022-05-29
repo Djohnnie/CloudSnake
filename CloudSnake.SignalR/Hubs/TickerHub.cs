@@ -1,18 +1,18 @@
-﻿using CloudSnake.Dto;
+﻿using CloudSnake.DataAccess;
+using CloudSnake.Domain;
+using CloudSnake.Dto;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace CloudSnake.SignalR.Hubs;
 
 public class TickerHub : Hub
 {
-    private List<string> _clientIds = new List<string>();
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
-    public async Task SendMessage(string user, string message)
+    public TickerHub(IServiceScopeFactory serviceScopeFactory)
     {
-        if (Clients != null)
-        {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
-        }
+        _serviceScopeFactory = serviceScopeFactory;
     }
 
     public async Task SendGameState(GameState gameState)
@@ -28,13 +28,22 @@ public class TickerHub : Hub
         await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);
     }
 
-    public void Ready(string clientId)
+    public async Task Turn(string gameCode, string playerName, Orientation orientation)
     {
+        if (string.IsNullOrWhiteSpace(gameCode) || string.IsNullOrWhiteSpace(playerName))
+        {
+            return;
+        }
 
-    }
-
-    public async Task Turn(string clientId)
-    {
-        _clientIds.Add(clientId);
+        using var scope = _serviceScopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetService<CloudSnakeDbContext>();
+        var player = await dbContext.Players.SingleOrDefaultAsync(x => x.Game.Code == gameCode && x.Name == playerName);
+        if (player != null)
+        {
+            var snake = Snake.FromSnakeData(player.SnakeData);
+            snake.Orientation = orientation;
+            player.SnakeData = snake.ToSnakeData();
+            await dbContext.SaveChangesAsync();
+        }
     }
 }

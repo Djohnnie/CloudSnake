@@ -27,14 +27,15 @@ public class GameClient
         return joinGameResponse.GameCode;
     }
 
-
-
     public async Task PlayerReady(string gameCode, string playerName)
     {
-        var request = new JoinGameRequest(gameCode, playerName);
-
         var client = new HttpClient();
-        var response = await client.PostAsJsonAsync($"https://localhost:7248/games/{gameCode}/ready/{playerName}", "null");
-        //var joinGameResponse = await response.Content.ReadFromJsonAsync<ReadyPlayerResponse>();
+        _ = await client.PostAsJsonAsync($"https://localhost:7248/games/{gameCode}/ready/{playerName}", "null");
+    }
+
+    public async Task Abandon(string gameCode, string playerName)
+    {
+        var client = new HttpClient();
+        _ = await client.PostAsJsonAsync($"https://localhost:7248/games/{gameCode}/abandon/{playerName}", "null");
     }
 }

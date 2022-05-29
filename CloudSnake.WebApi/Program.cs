@@ -29,5 +29,6 @@ app.MapGet("/status", () => Results.Ok);
 app.MapPost("/games", (IApiHelper<GameManager> helper, CreateGameRequest request) => helper.Post(l => l.CreateGame(request)));
 app.MapPost("/games/{gameCode}/join", (IApiHelper<GameManager> helper, [FromRoute] string gameCode, JoinGameRequest request) => helper.Post(l => l.JoinGame(request with { GameCode = gameCode })));
 app.MapPost("/games/{gameCode}/ready/{playerName}", (IApiHelper<GameManager> helper, [FromRoute] string gameCode, [FromRoute] string playerName) => helper.Post(l => l.ReadyPlayer(new ReadyPlayerRequest(gameCode, playerName))));
+app.MapPost("/games/{gameCode}/abandon/{playerName}", (IApiHelper<GameManager> helper, [FromRoute] string gameCode, [FromRoute] string playerName) => helper.Post(l => l.Abandon(new AbandonRequest(gameCode, playerName))));
 
 app.Run();

@@ -154,6 +154,8 @@ partial class MainForm
             // 
             // currentGameCodeLabel
             // 
+            this.currentGameCodeLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.currentGameCodeLabel.Font = new System.Drawing.Font("Segoe UI", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.currentGameCodeLabel.Location = new System.Drawing.Point(3, 0);
             this.currentGameCodeLabel.Name = "currentGameCodeLabel";
@@ -186,12 +188,6 @@ partial class MainForm
             this.playersListBox.FormattingEnabled = true;
             this.playersListBox.IntegralHeight = false;
             this.playersListBox.ItemHeight = 85;
-            this.playersListBox.Items.AddRange(new object[] {
-            "Player 1 (Ready)",
-            "Player 2 (Not ready)",
-            "Player 3 (Not ready)",
-            "Player 4 (Ready)",
-            "Player 5 (Not ready)"});
             this.playersListBox.Location = new System.Drawing.Point(42, 94);
             this.playersListBox.Name = "playersListBox";
             this.playersListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
@@ -278,7 +274,9 @@ partial class MainForm
             this.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.Name = "MainForm";
             this.Text = "CloudSnake";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.MainForm_Paint);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             this.mainMenuPanel.ResumeLayout(false);
             this.mainMenuPanel.PerformLayout();
