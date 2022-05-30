@@ -9,6 +9,7 @@ namespace CloudSnake.WinForms;
 
 public partial class MainForm : Form
 {
+    private static string SignalRHost = "https://aca-cloudsnake-signalr.thankfulfield-f49b8ec9.westeurope.azurecontainerapps.io/ticker";
     private static Color ClearColor = Color.FromArgb(63, 50, 102);
 
     private readonly Random _random = new();
@@ -57,7 +58,7 @@ public partial class MainForm : Form
         SnakeGameState = SnakeGameState.MainMenu;
 
         _connection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7080/ticker")
+            .WithUrl(SignalRHost)
             .Build();
 
         _connection.Closed += async (error) =>

@@ -20,16 +20,22 @@ public class CleanupFunction
     [FunctionName("CleanupFunction")]
     public async Task Run([TimerTrigger("0 0/5 * * * *")] TimerInfo myTimer, ILogger log)
     {
-        log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+        log.LogInformation($"CleanupFunction (time triggered) executing at: {DateTime.Now}");
 
         var inactiveGames = await _dbContext.Games.Where(x => !x.IsActive).ToListAsync();
+
+        var inactiveGameCount = inactiveGames.Count;
+        var inactivePlayerCount = 0;
 
         foreach (var game in inactiveGames)
         {
             var inactivePlayers = await _dbContext.Players.Where(x => x.Game.Code == game.Code).ToListAsync();
+            inactivePlayerCount += inactivePlayers.Count;
             _dbContext.Players.RemoveRange(inactivePlayers);
             _dbContext.Games.Remove(game);
             await _dbContext.SaveChangesAsync();
         }
+
+        log.LogInformation($"{inactiveGameCount} games and {inactivePlayerCount} players have been cleaned!");
     }
 }

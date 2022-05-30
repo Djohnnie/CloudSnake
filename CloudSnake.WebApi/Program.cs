@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
@@ -17,11 +19,8 @@ builder.Services.AddTransient(typeof(IApiHelper<>), typeof(ApiHelper<>));
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
@@ -30,5 +29,6 @@ app.MapPost("/games", (IApiHelper<GameManager> helper, CreateGameRequest request
 app.MapPost("/games/{gameCode}/join", (IApiHelper<GameManager> helper, [FromRoute] string gameCode, JoinGameRequest request) => helper.Post(l => l.JoinGame(request with { GameCode = gameCode })));
 app.MapPost("/games/{gameCode}/ready/{playerName}", (IApiHelper<GameManager> helper, [FromRoute] string gameCode, [FromRoute] string playerName) => helper.Post(l => l.ReadyPlayer(new ReadyPlayerRequest(gameCode, playerName))));
 app.MapPost("/games/{gameCode}/abandon/{playerName}", (IApiHelper<GameManager> helper, [FromRoute] string gameCode, [FromRoute] string playerName) => helper.Post(l => l.Abandon(new AbandonRequest(gameCode, playerName))));
+app.MapGet("/games/active", (IApiHelper<GameManager> helper) => helper.Execute(l => l.GetActiveGames()));
 
 app.Run();

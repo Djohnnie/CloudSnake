@@ -1,16 +1,25 @@
 ﻿using CloudSnake.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace CloudSnake.DataAccess;
 
 public class CloudSnakeDbContext : DbContext
 {
+    private readonly IConfiguration _configuration;
+
     public DbSet<Game> Games { get; set; }
     public DbSet<Player> Players { get; set; }
 
+    public CloudSnakeDbContext(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer(@"Server=.\SQLDEV;Database=CloudSnake;Trusted_Connection=True;");
+        var connectionString = _configuration.GetValue<string>("CONNECTION_STRING");
+        optionsBuilder.UseSqlServer(connectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

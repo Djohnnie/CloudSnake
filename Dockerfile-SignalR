@@ -1,0 +1,39 @@
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+WORKDIR /app
+EXPOSE 80
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
+COPY ["CloudSnake.SignalR.sln", "./"]
+COPY ["CloudSnake.Domain/*.csproj", "./CloudSnake.Domain/"]
+COPY ["CloudSnake.Dto/*.csproj", "./CloudSnake.Dto/"]
+COPY ["CloudSnake.DataAccess/*.csproj", "./CloudSnake.DataAccess/"]
+COPY ["CloudSnake.Business/*.csproj", "./CloudSnake.Business/"]
+COPY ["CloudSnake.SignalR/*.csproj", "./CloudSnake.SignalR/"]
+
+RUN dotnet restore
+COPY . .
+WORKDIR "/src/CloudSnake.Domain"
+RUN dotnet build "CloudSnake.Domain.csproj" -c Release -o /app/build
+WORKDIR "/src/CloudSnake.Dto"
+RUN dotnet build "CloudSnake.Dto.csproj" -c Release -o /app/build
+WORKDIR "/src/CloudSnake.DataAccess"
+RUN dotnet build "CloudSnake.DataAccess.csproj" -c Release -o /app/build
+WORKDIR "/src/CloudSnake.Business"
+RUN dotnet build "CloudSnake.Business.csproj" -c Release -o /app/build
+WORKDIR "/src/CloudSnake.SignalR"
+RUN dotnet build "CloudSnake.SignalR.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "CloudSnake.SignalR.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+
+EXPOSE 5000
+
+ENV TZ=Europe/Brussels
+ENV CONNECTION_STRING=...
+
+ENTRYPOINT ["dotnet", "CloudSnake.SignalR.dll"]
