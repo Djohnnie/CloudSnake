@@ -8,9 +8,9 @@ namespace CloudSnake.Business;
 
 public class GameManager
 {
-    public const int SnakeGameWidth = 50;
-    public const int SnakeGameHeight = 35;
-    public const int SnakeLength = 3;
+    public const int SnakeGameWidth = 30;
+    public const int SnakeGameHeight = 16;
+    public const int SnakeLength = 5;
 
     private readonly CloudSnakeDbContext _cloudSnakeDbContext;
     private readonly GameCodeHelper _gameCodeHelper;
@@ -107,6 +107,18 @@ public class GameManager
 
         return new GetActiveGamesResponse(
             activeGames.Select(x => new ActiveGame(x.Code, x.IsReady, x.Players.Select(p => new ActivePlayer(p.Name, p.IsReady, p.SnakeData)).ToList(), x.FoodData)).ToList());
+    }
+
+    public async Task<Orientation> GetPlayerOrientation(string gameCode, string playerName, Orientation current)
+    {
+        var player = await _cloudSnakeDbContext.Players.SingleOrDefaultAsync(x => x.Game.Code == gameCode && x.Name == playerName);
+
+        if (player != null)
+        {
+            return Snake.FromSnakeData(player.SnakeData).Orientation;
+        }
+
+        return current;
     }
 
     public async Task<AbandonResponse> Abandon(AbandonRequest request)

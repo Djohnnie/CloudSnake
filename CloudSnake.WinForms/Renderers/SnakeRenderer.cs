@@ -23,7 +23,7 @@ public static class SnakeRenderer
     {
         int pixelsPerTileX = bounds.Width / gameState.Width;
         int pixelsPerTileY = bounds.Height / gameState.Height;
-        int pixelsPerTile = Math.Min(pixelsPerTileX, pixelsPerTileY);
+        int pixelsPerTile = Math.Min(pixelsPerTileX, pixelsPerTileY) - 1;
 
         int offsetX = (bounds.Width - pixelsPerTile * gameState.Width) / 2;
         int offsetY = (bounds.Height - pixelsPerTile * gameState.Height) / 2;

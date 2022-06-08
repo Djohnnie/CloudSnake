@@ -80,7 +80,9 @@ public class TickerWorker : BackgroundService
                             }
                         }
 
-                        var newState = ProgressSnake(playerState, shouldGrow);
+                        var lastMinuteOrientation = await gameManager.GetPlayerOrientation(activeGame.GameCode, playerState.PlayerName, playerState.Snake.Orientation);
+                        var newPlayerState = playerState with { Snake = playerState.Snake with { Orientation = lastMinuteOrientation } };
+                        var newState = ProgressSnake(newPlayerState, shouldGrow);
                         newPlayerStates.Add(newState);
                     }
 
@@ -93,7 +95,7 @@ public class TickerWorker : BackgroundService
             }
 
             stopWatch.Stop();
-            await Task.Delay(Math.Max(0, 250 - (int)stopWatch.ElapsedMilliseconds), stoppingToken);
+            await Task.Delay(Math.Max(0, 500 - (int)stopWatch.ElapsedMilliseconds), stoppingToken);
         }
     }
 
@@ -161,7 +163,8 @@ public class TickerWorker : BackgroundService
                 break;
         }
 
-        List<Coordinates> newCoordinates = new List<Coordinates>(snake.Coordinates.Count);
+        var newCoordinates = new List<Coordinates>(snake.Coordinates.Count + (shouldGrow ? 1 : 0));
+
         for (int i = 0; i < snake.Coordinates.Count; i++)
         {
             if (i == 0)
